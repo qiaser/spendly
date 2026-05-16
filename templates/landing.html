@@ -4,28 +4,34 @@
 
 {% block content %}
 
+<!-- ── HERO ── -->
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-badge">Personal Finance Tracker</div>
         <h1 class="hero-title">
-            Know where your<br>
-            <em>money goes</em>
+            Finally know where<br>
+            <em>your money goes</em>
         </h1>
         <p class="hero-subtitle">
-            Log expenses, understand your spending patterns,
-            and take control of your financial life —
-            one transaction at a time.
+            Stop wondering where your salary disappeared. Spendly makes it
+            effortless to log expenses, spot patterns, and take back control —
+            in minutes a day.
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="btn-primary">Start tracking free</a>
-            <a href="{{ url_for('login') }}" class="btn-ghost">Sign in</a>
+            <a href="{{ url_for('login') }}" class="btn-ghost">Sign in &rarr;</a>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: 1.75rem;">
+            <span style="font-size: 0.8rem; color: var(--ink-faint);">&#10003; Free forever</span>
+            <span style="font-size: 0.8rem; color: var(--ink-faint);">&#10003; No credit card needed</span>
+            <span style="font-size: 0.8rem; color: var(--ink-faint);">&#10003; Your data stays private</span>
         </div>
     </div>
     <div class="hero-visual">
         <div class="mock-card">
             <div class="mock-card-header">
                 <span class="mock-label">March 2026</span>
-                <span class="mock-total">₹12,450</span>
+                <span class="mock-total">&#8377;12,450</span>
             </div>
             <div class="mock-bars">
                 <div class="mock-bar-row">
@@ -33,59 +39,178 @@
                     <div class="mock-bar-track">
                         <div class="mock-bar" style="width: 72%"></div>
                     </div>
-                    <span class="mock-amt">₹4,500</span>
+                    <span class="mock-amt">&#8377;4,500</span>
                 </div>
                 <div class="mock-bar-row">
                     <span class="mock-cat">Food</span>
                     <div class="mock-bar-track">
                         <div class="mock-bar mock-bar-2" style="width: 52%"></div>
                     </div>
-                    <span class="mock-amt">₹3,200</span>
+                    <span class="mock-amt">&#8377;3,200</span>
                 </div>
                 <div class="mock-bar-row">
                     <span class="mock-cat">Health</span>
                     <div class="mock-bar-track">
                         <div class="mock-bar mock-bar-3" style="width: 33%"></div>
                     </div>
-                    <span class="mock-amt">₹2,050</span>
+                    <span class="mock-amt">&#8377;2,050</span>
                 </div>
                 <div class="mock-bar-row">
                     <span class="mock-cat">Transport</span>
                     <div class="mock-bar-track">
                         <div class="mock-bar mock-bar-4" style="width: 28%"></div>
                     </div>
-                    <span class="mock-amt">₹1,800</span>
+                    <span class="mock-amt">&#8377;1,800</span>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-soft); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.75rem; color: var(--ink-muted);">vs last month</span>
+                <span style="font-size: 0.8rem; font-weight: 600; color: var(--accent);">&#8595; 8% less spending</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── STATS STRIP ── -->
+<div style="background: var(--paper-warm); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 2.5rem 2rem;">
+    <div style="max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center;">
+        <div>
+            <div style="font-family: var(--font-display); font-size: 2.25rem; color: var(--ink); line-height: 1.1;">10,000+</div>
+            <div style="font-size: 0.85rem; color: var(--ink-muted); margin-top: 0.35rem;">Active users</div>
+        </div>
+        <div style="border-left: 1px solid var(--border); border-right: 1px solid var(--border);">
+            <div style="font-family: var(--font-display); font-size: 2.25rem; color: var(--ink); line-height: 1.1;">&#8377;50Cr+</div>
+            <div style="font-size: 0.85rem; color: var(--ink-muted); margin-top: 0.35rem;">Expenses tracked</div>
+        </div>
+        <div>
+            <div style="font-family: var(--font-display); font-size: 2.25rem; color: var(--ink); line-height: 1.1;">4.9 &#9733;</div>
+            <div style="font-size: 0.85rem; color: var(--ink-muted); margin-top: 0.35rem;">Average rating</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── FEATURES ── -->
+<section class="features">
+    <div style="max-width: var(--max-width); margin: 0 auto 3rem; text-align: center;">
+        <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3vw, 2.5rem); color: var(--ink); margin-bottom: 0.75rem;">
+            Everything you need, nothing you don&rsquo;t
+        </h2>
+        <p style="font-size: 1rem; color: var(--ink-muted); max-width: 460px; margin: 0 auto; line-height: 1.7;">
+            Simple, focused tools for the one thing that matters — understanding your spending.
+        </p>
+    </div>
+    <div class="features-inner">
+        <div class="feature-card">
+            <div class="feature-icon">&#8377;</div>
+            <h3 class="feature-title">Log expenses instantly</h3>
+            <p class="feature-body">Add any expense in seconds. Category, amount, date, description — all in one simple form. No friction, no fuss.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9678;</div>
+            <h3 class="feature-title">Understand your patterns</h3>
+            <p class="feature-body">See exactly where your money goes with category breakdowns and monthly summaries that reveal hidden spending habits.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9719;</div>
+            <h3 class="feature-title">Filter by time period</h3>
+            <p class="feature-body">View your spending for any date range — last week, last month, or a custom period. Your data, your timeline.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section style="padding: 6rem 2rem; background: var(--paper-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div style="max-width: var(--max-width); margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 3.5rem;">
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3vw, 2.5rem); color: var(--ink); margin-bottom: 0.75rem;">
+                Up and running in 3 steps
+            </h2>
+            <p style="font-size: 1rem; color: var(--ink-muted);">No complicated setup. No learning curve.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+            <div style="text-align: center; padding: 2rem 1.5rem;">
+                <div style="width: 48px; height: 48px; background: var(--accent-light); color: var(--accent); border-radius: 50%; font-weight: 700; font-size: 1.1rem; line-height: 48px; text-align: center; margin: 0 auto 1.25rem;">1</div>
+                <h3 style="font-family: var(--font-display); font-size: 1.2rem; color: var(--ink); margin-bottom: 0.6rem;">Create your account</h3>
+                <p style="font-size: 0.9rem; color: var(--ink-muted); line-height: 1.7;">Sign up free in under a minute. Just your name and email — no card required.</p>
+            </div>
+            <div style="text-align: center; padding: 2rem 1.5rem; border-left: 1px solid var(--border-soft); border-right: 1px solid var(--border-soft);">
+                <div style="width: 48px; height: 48px; background: var(--accent-2-light); color: var(--accent-2); border-radius: 50%; font-weight: 700; font-size: 1.1rem; line-height: 48px; text-align: center; margin: 0 auto 1.25rem;">2</div>
+                <h3 style="font-family: var(--font-display); font-size: 1.2rem; color: var(--ink); margin-bottom: 0.6rem;">Log your expenses</h3>
+                <p style="font-size: 0.9rem; color: var(--ink-muted); line-height: 1.7;">Add each expense as you go — amount, category, and a note. Takes less than 10 seconds.</p>
+            </div>
+            <div style="text-align: center; padding: 2rem 1.5rem;">
+                <div style="width: 48px; height: 48px; background: var(--accent-light); color: var(--accent); border-radius: 50%; font-weight: 700; font-size: 1.1rem; line-height: 48px; text-align: center; margin: 0 auto 1.25rem;">3</div>
+                <h3 style="font-family: var(--font-display); font-size: 1.2rem; color: var(--ink); margin-bottom: 0.6rem;">See your insights</h3>
+                <p style="font-size: 0.9rem; color: var(--ink-muted); line-height: 1.7;">Watch patterns emerge. Know where to cut back. Make smarter financial decisions every month.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section style="padding: 6rem 2rem; background: var(--paper);">
+    <div style="max-width: var(--max-width); margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3vw, 2.5rem); color: var(--ink); margin-bottom: 0.75rem;">
+                What our users say
+            </h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+            <div style="background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.75rem;">
+                <p style="font-size: 0.95rem; color: var(--ink-soft); line-height: 1.75; margin-bottom: 1.25rem;">
+                    &ldquo;I had no idea how much I was spending on food until Spendly showed me. Cut my food budget by 30% in the first month.&rdquo;
+                </p>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 36px; height: 36px; background: var(--accent-light); color: var(--accent); border-radius: 50%; font-weight: 700; font-size: 0.9rem; line-height: 36px; text-align: center;">A</div>
+                    <div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--ink);">Ayesha K.</div>
+                        <div style="font-size: 0.75rem; color: var(--ink-faint);">Software Engineer, Pune</div>
+                    </div>
+                </div>
+            </div>
+            <div style="background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.75rem;">
+                <p style="font-size: 0.95rem; color: var(--ink-soft); line-height: 1.75; margin-bottom: 1.25rem;">
+                    &ldquo;Finally a finance app that doesn&rsquo;t feel like using a spreadsheet. Clean, fast, and does exactly what I need.&rdquo;
+                </p>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 36px; height: 36px; background: var(--accent-2-light); color: var(--accent-2); border-radius: 50%; font-weight: 700; font-size: 0.9rem; line-height: 36px; text-align: center;">R</div>
+                    <div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--ink);">Rahul M.</div>
+                        <div style="font-size: 0.75rem; color: var(--ink-faint);">Freelancer, Bangalore</div>
+                    </div>
+                </div>
+            </div>
+            <div style="background: var(--paper-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.75rem;">
+                <p style="font-size: 0.95rem; color: var(--ink-soft); line-height: 1.75; margin-bottom: 1.25rem;">
+                    &ldquo;I started saving &#8377;5,000 more every month just by seeing my spending clearly. Simple app, real results.&rdquo;
+                </p>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 36px; height: 36px; background: var(--accent-light); color: var(--accent); border-radius: 50%; font-weight: 700; font-size: 0.9rem; line-height: 36px; text-align: center;">P</div>
+                    <div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--ink);">Priya S.</div>
+                        <div style="font-size: 0.75rem; color: var(--ink-faint);">Teacher, Delhi</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="features">
-    <div class="features-inner">
-        <div class="feature-card">
-            <div class="feature-icon">₹</div>
-            <h3 class="feature-title">Log expenses instantly</h3>
-            <p class="feature-body">Add any expense in seconds. Category, amount, date, description — all in one simple form.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">◎</div>
-            <h3 class="feature-title">Understand your patterns</h3>
-            <p class="feature-body">See exactly where your money goes with category breakdowns and monthly summaries.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">◷</div>
-            <h3 class="feature-title">Filter by time period</h3>
-            <p class="feature-body">View your spending for any date range — last week, last month, or a custom period.</p>
-        </div>
-    </div>
-</section>
-
-<section class="cta-section">
-    <div class="cta-inner">
-        <h2 class="cta-title">Ready to take control?</h2>
-        <p class="cta-body">Join thousands of people who track their expenses with Spendly.</p>
-        <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
+<!-- ── CTA ── -->
+<section style="background: var(--ink); padding: 6rem 2rem; text-align: center;">
+    <div style="max-width: 560px; margin: 0 auto;">
+        <h2 style="font-family: var(--font-display); font-size: clamp(1.75rem, 3vw, 2.5rem); color: var(--paper); margin-bottom: 1rem;">
+            Ready to take control?
+        </h2>
+        <p style="font-size: 1rem; color: var(--ink-faint); margin-bottom: 2rem; line-height: 1.7;">
+            Join thousands of people who track their expenses with Spendly.<br>Free, forever. No catch.
+        </p>
+        <a href="{{ url_for('register') }}" style="display: inline-block; background: var(--accent); color: var(--paper); padding: 0.85rem 2.25rem; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 1rem; font-weight: 500; text-decoration: none; transition: opacity 0.2s;">
+            Create free account
+        </a>
+        <p style="margin-top: 1.25rem; font-size: 0.8rem; color: var(--ink-faint);">
+            Already have an account? <a href="{{ url_for('login') }}" style="color: var(--paper); text-decoration: underline;">Sign in</a>
+        </p>
     </div>
 </section>
 
