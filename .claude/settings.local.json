@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python seed_expenses_temp.py)",
+      "Bash(git *)"
+    ]
+  }
+}
