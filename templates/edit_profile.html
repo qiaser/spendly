@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Edit profile — Spendly{% endblock %}
+
+{% block content %}
+<section class="profile-edit">
+  <h1 class="section-title">Edit profile</h1>
+
+  {% if error %}
+    <p class="form-error" role="alert">{{ error }}</p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('edit_profile') }}" class="profile-form" novalidate>
+    <label class="field">
+      <span class="field-label">Name</span>
+      <input type="text" name="name" required
+             value="{{ form.name if form else user.name }}">
+    </label>
+
+    <label class="field">
+      <span class="field-label">Email</span>
+      <input type="email" name="email" required
+             value="{{ form.email if form else user.email }}">
+    </label>
+
+    <fieldset class="field-group">
+      <legend>Change password <span class="field-hint">(optional)</span></legend>
+
+      <label class="field">
+        <span class="field-label">Current password</span>
+        <input type="password" name="current_password" autocomplete="current-password">
+      </label>
+
+      <label class="field">
+        <span class="field-label">New password</span>
+        <input type="password" name="new_password" autocomplete="new-password" minlength="8">
+        <span class="field-hint">At least 8 characters. Leave blank to keep your current password.</span>
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <a class="btn-ghost" href="{{ url_for('profile') }}">Cancel</a>
+      <button type="submit" class="btn-primary">Save changes</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

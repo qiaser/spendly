@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+
+  <header class="profile-header">
+    <div class="avatar" aria-hidden="true">{{ initials }}</div>
+    <div class="profile-identity">
+      <h1 class="profile-name">{{ user.name }}</h1>
+      <p class="profile-email">{{ user.email }}</p>
+    </div>
+    <a class="btn-primary" href="{{ url_for('edit_profile') }}">Edit profile</a>
+  </header>
+
+  <h2 class="section-title">This month</h2>
+  <div class="stats-grid">
+    <article class="stat-card">
+      <p class="stat-label">Total spent</p>
+      <p class="stat-value">${{ "%.2f"|format(stats.total_this_month) }}</p>
+    </article>
+
+    <article class="stat-card">
+      <p class="stat-label">Budget used</p>
+      <p class="stat-value">{{ stats.budget_used_pct }}%</p>
+      <div class="progress" role="progressbar"
+           aria-valuenow="{{ stats.budget_used_pct }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" style="width: {{ stats.budget_used_pct }}%"></div>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <p class="stat-label">Top category</p>
+      <p class="stat-value stat-value--text">{{ stats.top_category }}</p>
+    </article>
+
+    <article class="stat-card">
+      <p class="stat-label">All transactions</p>
+      <p class="stat-value">{{ stats.recent_count }}</p>
+    </article>
+  </div>
+
+  {% if stats.recent_count == 0 %}
+    <p class="empty-hint">No transactions yet. <a href="{{ url_for('add_expense') }}">Add your first expense</a> to start tracking.</p>
+  {% endif %}
+
+</section>
+{% endblock %}
