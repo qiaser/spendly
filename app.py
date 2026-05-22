@@ -180,11 +180,43 @@ def profile():
                 min(round(stats["total_this_month"] / monthly_budget * 100), 100)
                 if monthly_budget else 0
             )
+
+        transactions = []
+        category_totals = []
+        if {"amount", "user_id", "category", "date"}.issubset(cols):
+            date_col = next((c for c in ("date", "spent_on", "created_at") if c in cols), "date")
+            transactions = conn.execute(
+                f"SELECT id, amount, category, {date_col} AS date, description "
+                "FROM expenses WHERE user_id = ? ORDER BY date DESC",
+                (user_id,),
+            ).fetchall()
+
+            cat_rows = conn.execute(
+                "SELECT category, SUM(amount) AS total FROM expenses "
+                "WHERE user_id = ? GROUP BY category ORDER BY total DESC",
+                (user_id,),
+            ).fetchall()
+            grand_total = sum(r["total"] for r in cat_rows) or 1
+            category_totals = [
+                {
+                    "name": r["category"],
+                    "total": float(r["total"]),
+                    "pct": round(float(r["total"]) / grand_total * 100),
+                }
+                for r in cat_rows
+            ]
     finally:
         conn.close()
 
     initials = "".join(part[:1].upper() for part in user["name"].split()[:2]) or "?"
-    return render_template("profile.html", user=user, stats=stats, initials=initials)
+    return render_template(
+        "profile.html",
+        user=user,
+        stats=stats,
+        initials=initials,
+        transactions=transactions,
+        category_totals=category_totals,
+    )
 
 
 @app.route("/profile/edit", methods=["GET", "POST"])
