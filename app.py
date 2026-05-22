@@ -17,6 +17,67 @@ def _expenses_columns(conn):
         return set()
 
 
+def _profile_transactions(conn, user_id, cols):
+    # SUBAGENT-1: transaction history — return all expense rows newest-first
+    if not {"amount", "user_id", "category", "date"}.issubset(cols):
+        return []
+    date_col = next((c for c in ("date", "spent_on", "created_at") if c in cols), "date")
+    return conn.execute(
+        f"SELECT id, amount, category, {date_col} AS date, description "
+        "FROM expenses WHERE user_id = ? ORDER BY date DESC",
+        (user_id,),
+    ).fetchall()
+
+
+def _profile_stats(conn, user_id, cols):
+    stats = {"total_spent": 0.0, "top_category": "—", "transaction_count": 0}
+    if {"amount", "user_id"}.issubset(cols):
+        row = conn.execute(
+            "SELECT COALESCE(SUM(amount), 0) AS total FROM expenses WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        if row is not None:
+            stats["total_spent"] = float(row["total"])
+
+        row = conn.execute(
+            "SELECT COUNT(*) AS c FROM expenses WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        if row is not None:
+            stats["transaction_count"] = int(row["c"])
+
+        if "category" in cols:
+            row = conn.execute(
+                "SELECT category, SUM(amount) AS s FROM expenses"
+                " WHERE user_id = ? GROUP BY category ORDER BY s DESC LIMIT 1",
+                (user_id,),
+            ).fetchone()
+            if row is not None and row["category"]:
+                stats["top_category"] = row["category"]
+    return stats
+
+
+def _profile_category_totals(conn, user_id, cols):
+    # SUBAGENT-3: category breakdown — return list of {name, total, pct}
+    if not {"amount", "user_id", "category"}.issubset(cols):
+        return []
+    cat_rows = conn.execute(
+        "SELECT category, SUM(amount) AS total "
+        "FROM expenses WHERE user_id = ? "
+        "GROUP BY category ORDER BY total DESC",
+        (user_id,),
+    ).fetchall()
+    grand_total = sum(r["total"] for r in cat_rows) or 1
+    return [
+        {
+            "name": r["category"],
+            "total": float(r["total"]),
+            "pct": round(float(r["total"]) / grand_total * 100),
+        }
+        for r in cat_rows
+    ]
+
+
 # ------------------------------------------------------------------ #
 # Routes                                                              #
 # ------------------------------------------------------------------ #
@@ -140,71 +201,10 @@ def profile():
             session.clear()
             return redirect(url_for("login"))
 
-        stats = {
-            "total_this_month": 0.0,
-            "budget_used_pct": 0,
-            "top_category": "—",
-            "recent_count": 0,
-        }
-        cols = _expenses_columns(conn)
-        if {"amount", "user_id"}.issubset(cols):
-            date_col = next((c for c in ("date", "spent_on", "created_at") if c in cols), None)
-            month_clause = (
-                f"AND strftime('%Y-%m', {date_col}) = strftime('%Y-%m', 'now')"
-                if date_col else ""
-            )
-
-            total_row = conn.execute(
-                f"SELECT COALESCE(SUM(amount), 0) AS total FROM expenses WHERE user_id = ? {month_clause}",
-                (user_id,),
-            ).fetchone()
-            stats["total_this_month"] = float(total_row["total"] or 0)
-
-            if "category" in cols:
-                top_row = conn.execute(
-                    f"""SELECT category, SUM(amount) AS s
-                    FROM expenses WHERE user_id = ? {month_clause}
-                    GROUP BY category ORDER BY s DESC LIMIT 1""",
-                    (user_id,),
-                ).fetchone()
-                if top_row and top_row["category"]:
-                    stats["top_category"] = top_row["category"]
-
-            count_row = conn.execute(
-                "SELECT COUNT(*) AS c FROM expenses WHERE user_id = ?", (user_id,)
-            ).fetchone()
-            stats["recent_count"] = int(count_row["c"] or 0)
-
-            monthly_budget = 500.0
-            stats["budget_used_pct"] = (
-                min(round(stats["total_this_month"] / monthly_budget * 100), 100)
-                if monthly_budget else 0
-            )
-
-        transactions = []
-        category_totals = []
-        if {"amount", "user_id", "category", "date"}.issubset(cols):
-            date_col = next((c for c in ("date", "spent_on", "created_at") if c in cols), "date")
-            transactions = conn.execute(
-                f"SELECT id, amount, category, {date_col} AS date, description "
-                "FROM expenses WHERE user_id = ? ORDER BY date DESC",
-                (user_id,),
-            ).fetchall()
-
-            cat_rows = conn.execute(
-                "SELECT category, SUM(amount) AS total FROM expenses "
-                "WHERE user_id = ? GROUP BY category ORDER BY total DESC",
-                (user_id,),
-            ).fetchall()
-            grand_total = sum(r["total"] for r in cat_rows) or 1
-            category_totals = [
-                {
-                    "name": r["category"],
-                    "total": float(r["total"]),
-                    "pct": round(float(r["total"]) / grand_total * 100),
-                }
-                for r in cat_rows
-            ]
+        cols            = _expenses_columns(conn)
+        stats           = _profile_stats(conn, user_id, cols)
+        category_totals = _profile_category_totals(conn, user_id, cols)
+        transactions    = _profile_transactions(conn, user_id, cols)
     finally:
         conn.close()
 
