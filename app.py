@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date, timedelta
 
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,55 +18,68 @@ def _expenses_columns(conn):
         return set()
 
 
-def _profile_transactions(conn, user_id, cols):
-    # SUBAGENT-1: transaction history — return all expense rows newest-first
+def _profile_transactions(conn, user_id, cols, date_from=None, date_to=None):
     if not {"amount", "user_id", "category", "date"}.issubset(cols):
         return []
     date_col = next((c for c in ("date", "spent_on", "created_at") if c in cols), "date")
+    where = "WHERE user_id = ?"
+    params = [user_id]
+    if date_from and date_to:
+        where += " AND date >= ? AND date <= ?"
+        params += [date_from, date_to]
     return conn.execute(
         f"SELECT id, amount, category, {date_col} AS date, description "
-        "FROM expenses WHERE user_id = ? ORDER BY date DESC",
-        (user_id,),
+        f"FROM expenses {where} ORDER BY date DESC",
+        params,
     ).fetchall()
 
 
-def _profile_stats(conn, user_id, cols):
+def _profile_stats(conn, user_id, cols, date_from=None, date_to=None):
     stats = {"total_spent": 0.0, "top_category": "—", "transaction_count": 0}
+    where = "WHERE user_id = ?"
+    params = [user_id]
+    if date_from and date_to:
+        where += " AND date >= ? AND date <= ?"
+        params += [date_from, date_to]
     if {"amount", "user_id"}.issubset(cols):
         row = conn.execute(
-            "SELECT COALESCE(SUM(amount), 0) AS total FROM expenses WHERE user_id = ?",
-            (user_id,),
+            f"SELECT COALESCE(SUM(amount), 0) AS total FROM expenses {where}",
+            params,
         ).fetchone()
         if row is not None:
             stats["total_spent"] = float(row["total"])
 
         row = conn.execute(
-            "SELECT COUNT(*) AS c FROM expenses WHERE user_id = ?",
-            (user_id,),
+            f"SELECT COUNT(*) AS c FROM expenses {where}",
+            params,
         ).fetchone()
         if row is not None:
             stats["transaction_count"] = int(row["c"])
 
         if "category" in cols:
             row = conn.execute(
-                "SELECT category, SUM(amount) AS s FROM expenses"
-                " WHERE user_id = ? GROUP BY category ORDER BY s DESC LIMIT 1",
-                (user_id,),
+                f"SELECT category, SUM(amount) AS s FROM expenses"
+                f" {where} GROUP BY category ORDER BY s DESC LIMIT 1",
+                params,
             ).fetchone()
             if row is not None and row["category"]:
                 stats["top_category"] = row["category"]
     return stats
 
 
-def _profile_category_totals(conn, user_id, cols):
-    # SUBAGENT-3: category breakdown — return list of {name, total, pct}
+def _profile_category_totals(conn, user_id, cols, date_from=None, date_to=None):
     if not {"amount", "user_id", "category"}.issubset(cols):
         return []
+    where = "WHERE user_id = ?"
+    params = [user_id]
+    if date_from and date_to:
+        where += " AND date >= ? AND date <= ?"
+        params += [date_from, date_to]
     cat_rows = conn.execute(
-        "SELECT category, SUM(amount) AS total "
-        "FROM expenses WHERE user_id = ? "
-        "GROUP BY category ORDER BY total DESC",
-        (user_id,),
+        f"SELECT category, SUM(amount) AS total "
+        f"FROM expenses {where} "
+        f"GROUP BY category ORDER BY total DESC",
+        params,
     ).fetchall()
     grand_total = sum(r["total"] for r in cat_rows) or 1
     return [
@@ -192,6 +206,37 @@ def profile():
     if not user_id:
         return redirect(url_for("login"))
 
+    period = request.args.get("period", "month")
+    today = date.today()
+    custom_from = custom_to = ""
+
+    if period == "30d":
+        date_from, date_to = str(today - timedelta(days=29)), str(today)
+    elif period == "90d":
+        date_from, date_to = str(today - timedelta(days=89)), str(today)
+    elif period == "all":
+        date_from = date_to = None
+    elif period == "custom":
+        raw_from = request.args.get("date_from", "").strip()
+        raw_to   = request.args.get("date_to",   "").strip()
+        try:
+            df = date.fromisoformat(raw_from)
+            dt = date.fromisoformat(raw_to)
+            if df > dt:
+                df, dt = dt, df
+            date_from   = str(df)
+            date_to     = str(dt)
+            custom_from = date_from
+            custom_to   = date_to
+        except ValueError:
+            period    = "month"
+            date_from = str(today.replace(day=1))
+            date_to   = str(today)
+    else:
+        period    = "month"
+        date_from = str(today.replace(day=1))
+        date_to   = str(today)
+
     conn = get_db()
     try:
         user = conn.execute(
@@ -202,9 +247,9 @@ def profile():
             return redirect(url_for("login"))
 
         cols            = _expenses_columns(conn)
-        stats           = _profile_stats(conn, user_id, cols)
-        category_totals = _profile_category_totals(conn, user_id, cols)
-        transactions    = _profile_transactions(conn, user_id, cols)
+        stats           = _profile_stats(conn, user_id, cols, date_from, date_to)
+        category_totals = _profile_category_totals(conn, user_id, cols, date_from, date_to)
+        transactions    = _profile_transactions(conn, user_id, cols, date_from, date_to)
     finally:
         conn.close()
 
@@ -216,6 +261,9 @@ def profile():
         initials=initials,
         transactions=transactions,
         category_totals=category_totals,
+        active_period=period,
+        custom_from=custom_from,
+        custom_to=custom_to,
     )
 
 

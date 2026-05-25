@@ -16,7 +16,13 @@
 
   <div class="stats-grid">
     <article class="stat-card">
-      <p class="stat-label">Total spent</p>
+      <p class="stat-label">
+        {%- if active_period == 'month' %}Total spent (this month)
+        {%- elif active_period == '30d' %}Total spent (30 days)
+        {%- elif active_period == '90d' %}Total spent (90 days)
+        {%- elif active_period == 'custom' %}Total spent (custom range)
+        {%- else %}Total spent{%- endif %}
+      </p>
       <p class="stat-value">${{ "%.2f"|format(stats.total_spent) }}</p>
     </article>
 
@@ -30,6 +36,30 @@
       <p class="stat-value stat-value--text">{{ stats.top_category }}</p>
     </article>
   </div>
+
+  <div class="filter-bar">
+    <a href="?period=month" class="filter-btn{% if active_period == 'month' %} active{% endif %}">This Month</a>
+    <a href="?period=30d"   class="filter-btn{% if active_period == '30d'   %} active{% endif %}">Last 30 Days</a>
+    <a href="?period=90d"   class="filter-btn{% if active_period == '90d'   %} active{% endif %}">Last 90 Days</a>
+    <a href="?period=all"   class="filter-btn{% if active_period == 'all'   %} active{% endif %}">All Time</a>
+    <span class="filter-btn{% if active_period == 'custom' %} active{% endif %} filter-btn--custom-toggle">Custom range</span>
+  </div>
+
+  <form class="custom-date-form{% if active_period != 'custom' %} custom-date-form--hidden{% endif %}"
+        action="{{ url_for('profile') }}" method="get">
+    <input type="hidden" name="period" value="custom">
+    <div class="date-inputs">
+      <div class="date-input-group">
+        <label for="date_from">From</label>
+        <input type="date" id="date_from" name="date_from" value="{{ custom_from }}" required>
+      </div>
+      <div class="date-input-group">
+        <label for="date_to">To</label>
+        <input type="date" id="date_to" name="date_to" value="{{ custom_to }}" required>
+      </div>
+      <button type="submit" class="btn-ghost">Apply</button>
+    </div>
+  </form>
 
   {% if stats.transaction_count == 0 %}
     <p class="empty-hint">No transactions yet. <a href="{{ url_for('add_expense') }}">Add your first expense</a> to start tracking.</p>
@@ -76,4 +106,17 @@
   {% endif %}
 
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const toggle = document.querySelector('.filter-btn--custom-toggle');
+  const form   = document.querySelector('.custom-date-form');
+  if (toggle && form) {
+    toggle.style.cursor = 'pointer';
+    toggle.addEventListener('click', () => {
+      form.classList.toggle('custom-date-form--hidden');
+    });
+  }
+</script>
 {% endblock %}
